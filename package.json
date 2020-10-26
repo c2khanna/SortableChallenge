@@ -1,0 +1,19 @@
+{
+  "name": "sortablechallenge",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js < input.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/c2khanna/SortableChallenge.git"
+  },
+  "author": "Chaitanya Khanna",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/c2khanna/SortableChallenge/issues"
+  },
+  "homepage": "https://github.com/c2khanna/SortableChallenge#readme"
+}
