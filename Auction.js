@@ -1,4 +1,13 @@
-const {getSites, getBidders} = require('./configUtils');
+/**
+ * This auction class standardizes the member variables for a given auction.
+ * It also contains the runAuction function, which checks the auction against
+ * the given constraints and returns the winning bids for the given auction
+ */
+
+const {
+  getSites,
+  getBidders
+} = require('./configUtils');
 
 class Auction {
   constructor(auction) {
@@ -9,30 +18,28 @@ class Auction {
 
   runAuction() {
     let winningBids = [];
+    let maxBids = new Map();
 
-    for (let unit of this.units) {
-      let unitBids = this.bids.filter(bid => {
-        return (bid.unit === unit &&
-          getSites().get(this.site).bidders.indexOf(bid.bidder) > -1)
-      });
-
-      let maxBid = null;
-
-      for (let unitBid of unitBids) {
-        let adjustedUnitBid = this.getAdjustedBid(unitBid);
+    for (let bid of this.bids) {
+      // check that bidder is allowed for this site and the unit is valid that they are bidding on
+      if (getSites().get(this.site).bidders.indexOf(bid.bidder) > -1 && this.units.indexOf(bid.unit) > -1) {
+        let adjustedUnitBid = this.getAdjustedBid(bid);
         if (adjustedUnitBid > getSites().get(this.site).floor) {
-          if (!maxBid) {
-            maxBid = unitBid;
-          } else if(adjustedUnitBid > this.getAdjustedBid(maxBid)) {
-            maxBid = unitBid
+          if (!maxBids.has(bid.unit) || (adjustedUnitBid > maxBids.get(bid.unit).maxAdjBidVal)) {
+            maxBids.set(bid.unit, {
+              bid,
+              maxAdjBidVal: adjustedUnitBid
+            });
           }
         }
       }
+    }
 
-      if (maxBid) {
-        winningBids.push(maxBid);
+    for (let unit of this.units) {
+      if (maxBids.has(unit)) {
+        winningBids.push(maxBids.get(unit).bid);
       } else {
-        winningBids.push({});
+        winningBids.push({})
       }
     }
 
@@ -40,7 +47,7 @@ class Auction {
   }
 
   getAdjustedBid(bid) {
-    return (bid.bid+bid.bid*getBidders().get(bid.bidder));
+    return (bid.bid + bid.bid * getBidders().get(bid.bidder));
   }
 }
 
